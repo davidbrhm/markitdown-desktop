@@ -1,20 +1,179 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:MarkItDownDesktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="650"
+        Width="1100" Height="650"
+        MinWidth="750" MinHeight="450"
         x:Class="MarkItDownDesktop.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="MarkItDownDesktop">
+        Title="MarkItDown Desktop"
+        Background="#1C1C1E"
+        RequestedThemeVariant="Dark"
+        WindowStartupLocation="CenterScreen"
+        xmlns:vm="using:MarkItDownDesktop.ViewModels"
+        x:DataType="vm:MainWindowViewModel">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+    <Window.Styles>
+        <!-- Custom hover and active styles for the toggle buttons -->
+        <Style Selector="Button.ToggleActive">
+            <Setter Property="Background" Value="#2D2D30" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.ToggleInactive">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#A1A1A6" />
+        </Style>
+        <Style Selector="Button.ToggleInactive:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#252528" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+        </Style>
+    </Window.Styles>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Grid ColumnDefinitions="*, 8, *" Margin="24">
 
+        <!-- LEFT PANEL: Import / Drag & Drop Zone -->
+        <Grid Grid.Column="0" DragDrop.AllowDrop="True">
+            <Border Name="DragDropBorder" Background="#252528" CornerRadius="12" ClipToBounds="True">
+                <Panel>
+                    <!-- Dashed border simulation -->
+                    <Rectangle Stroke="#444446"
+                               StrokeDashArray="4,4"
+                               StrokeThickness="2"
+                               RadiusX="12"
+                               RadiusY="12"
+                               Margin="2" />
+
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+                        <Viewbox Width="64" Height="64">
+                            <Path Fill="#A1A1A6"
+                                  Data="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-2 16l-4-4h3V10h2v4h3l-4 4zm1-9V3.5L18.5 9H13z" />
+                        </Viewbox>
+                        <TextBlock Text="Drag &amp; Drop File Here" FontSize="18" FontWeight="SemiBold"
+                                   Foreground="#FFFFFF" HorizontalAlignment="Center" />
+                        <TextBlock Text="Supported: PDF, DOCX, XLSX, PPTX, HTML, Audio, Images" FontSize="12"
+                                   Foreground="#A1A1A6" HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="300"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Panel>
+            </Border>
+        </Grid>
+
+        <GridSplitter Grid.Column="1" Background="Transparent" Width="8" />
+
+        <!-- RIGHT PANEL:  Export / Preview Zone -->
+        <Grid Grid.Column="2" RowDefinitions="Auto, *">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,16">
+                <Border Grid.Column="0" Background="#252528" CornerRadius="8" Padding="3" BorderBrush="#333335"
+                        BorderThickness="1">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Button Command="{Binding SelectFileViewCommand}"
+                                Classes.ToggleActive="{Binding !IsCodeViewActive}"
+                                Classes.ToggleInactive="{Binding IsCodeViewActive}"
+                                Content="File View" Padding="16,8" CornerRadius="6"
+                                BorderThickness="0" />
+                        <Button Command="{Binding SelectCodeViewCommand}"
+                                Classes.ToggleActive="{Binding IsCodeViewActive}"
+                                Classes.ToggleInactive="{Binding !IsCodeViewActive}"
+                                Content="Code View" Padding="16,8"
+                                CornerRadius="6"
+                                BorderThickness="0" />
+                    </StackPanel>
+                </Border>
+
+                <Button Grid.Column="1"
+                        IsVisible="{Binding IsCodeViewActive}"
+                        Content="Copy to Clipboard"
+                        HorizontalAlignment="Right"
+                        Background="#2D2D30"
+                        Foreground="#E1E1E6"
+                        Padding="16,8"
+                        CornerRadius="8"
+                        BorderBrush="#444446"
+                        BorderThickness="1">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#3D3D42" />
+                            <Setter Property="BorderBrush" Value="#555558" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </Grid>
+
+            <!-- Symmetric Output Container (Solid Border matching the Left Panel) -->
+            <Border Grid.Row="1" Background="#252528" CornerRadius="12" ClipToBounds="True">
+                <Panel>
+                    <Rectangle Stroke="#444446"
+                               StrokeThickness="2"
+                               RadiusX="12"
+                               RadiusY="12"
+                               Margin="2" />
+                    <Grid Margin="12">
+
+                        <!-- VIEW: File View -->
+                        <ScrollViewer IsVisible="{Binding !IsCodeViewActive}" VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Spacing="8" Margin="4">
+
+                                <!-- File Item 1 -->
+                                <Border Background="#1C1C1E" CornerRadius="8" Padding="14,12" BorderBrush="#2D2D30"
+                                        BorderThickness="1" Cursor="Hand">
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Path Grid.Column="0" Fill="#FFB900"
+                                              Data="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
+                                              Width="22" Height="22" Stretch="Uniform" VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">
+                                            <TextBlock Text="converted_presentation.md" FontWeight="SemiBold"
+                                                       Foreground="#FFFFFF" FontSize="13" />
+                                            <TextBlock Text="4.8 KB • Just now" Foreground="#85858A" FontSize="11"
+                                                       Margin="0,2,0,0" />
+                                        </StackPanel>
+                                        <!-- Drag indicator -->
+                                        <Path Grid.Column="2" Fill="#A1A1A6"
+                                              Data="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6v3H3l5 5 5-5h-3v-3zm2 5h4v3h3l-5 5-5-5h3v-3zm3-5h3V6h3l-5-5-5 5h3v4z"
+                                              Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center"
+                                              Opacity="0.5" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- File Item 2 -->
+                                <Border Background="#1C1C1E" CornerRadius="8" Padding="14,12" BorderBrush="#2D2D30"
+                                        BorderThickness="1" Cursor="Hand">
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <Path Grid.Column="0" Fill="#FFB900"
+                                              Data="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
+                                              Width="22" Height="22" Stretch="Uniform" VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">
+                                            <TextBlock Text="annual_report.md" FontWeight="SemiBold"
+                                                       Foreground="#FFFFFF" FontSize="13" />
+                                            <TextBlock Text="12.4 KB • 5 minutes ago" Foreground="#85858A"
+                                                       FontSize="11" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                        <Path Grid.Column="2" Fill="#A1A1A6"
+                                              Data="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6v3H3l5 5 5-5h-3v-3zm2 5h4v3h3l-5 5-5-5h3v-3zm3-5h3V6h3l-5-5-5 5h3v4z"
+                                              Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center"
+                                              Opacity="0.5" />
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- VIEW: Code View -->
+                        <TextBox IsVisible="{Binding IsCodeViewActive}"
+                                 Text="CodeView"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 FontFamily="Consolas, Cascadia Code, monospace"
+                                 FontSize="13"
+                                 Background="Transparent"
+                                 Foreground="#E1E1E6"
+                                 BorderThickness="0"
+                                 Padding="8"
+                                 Margin="4" />
+                    </Grid>
+                </Panel>
+            </Border>
+        </Grid>
+    </Grid>
 </Window>
