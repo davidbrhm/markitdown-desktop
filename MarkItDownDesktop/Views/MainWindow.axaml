@@ -11,7 +11,8 @@
         RequestedThemeVariant="Dark"
         WindowStartupLocation="CenterScreen"
         xmlns:vm="using:MarkItDownDesktop.ViewModels"
-        x:DataType="vm:MainWindowViewModel">
+        x:DataType="vm:MainWindowViewModel"
+        xmlns:models="using:MarkItDownDesktop.Models">
 
     <Window.Styles>
         <!-- Custom hover and active styles for the toggle buttons -->
@@ -33,18 +34,19 @@
     <Grid ColumnDefinitions="*, 8, *" Margin="24">
 
         <!-- LEFT PANEL: Import / Drag & Drop Zone -->
-        <Grid Grid.Column="0" DragDrop.AllowDrop="True">
+        <Grid Grid.Column="0" DragDrop.AllowDrop="True" DragDrop.DragOver="OnDragOver" DragDrop.Drop="OnDrop">
             <Border Name="DragDropBorder" Background="#252528" CornerRadius="12" ClipToBounds="True">
                 <Panel>
-                    <!-- Dashed border simulation -->
+                    <!-- Dashed border -->
                     <Rectangle Stroke="#444446"
                                StrokeDashArray="4,4"
                                StrokeThickness="2"
                                RadiusX="12"
                                RadiusY="12"
                                Margin="2" />
-
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+                    <!-- Empty state -->
+                    <StackPanel IsVisible="{Binding !HasFiles}" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                Spacing="16">
                         <Viewbox Width="64" Height="64">
                             <Path Fill="#A1A1A6"
                                   Data="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-2 16l-4-4h3V10h2v4h3l-4 4zm1-9V3.5L18.5 9H13z" />
@@ -55,6 +57,27 @@
                                    Foreground="#A1A1A6" HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="300"
                                    TextAlignment="Center" />
                     </StackPanel>
+
+                    <!-- Directory state -->
+                    <ScrollViewer IsVisible="{Binding HasFiles}" Margin="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Workspace Files" FontSize="14" FontWeight="SemiBold" Foreground="#A1A1A6"
+                                       Margin="4,0,0,8" />
+
+                            <ItemsControl ItemsSource="{Binding ConvertedFiles}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:ConvertedFile">
+                                        <Grid ColumnDefinitions="*, Auto" Margin="0,4">
+                                            <TextBlock Text="{Binding Name}" Foreground="#FFFFFF" FontSize="13"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="1" Text="{Binding SizeText}" Foreground="#85858A"
+                                                       FontSize="11" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Panel>
             </Border>
         </Grid>
