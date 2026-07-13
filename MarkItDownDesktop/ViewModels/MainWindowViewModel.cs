@@ -19,50 +19,46 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             Directory.CreateDirectory(_workspaceDirectory);
         }
+
+        LoadExistingFiles();
     }
-
-    public bool HasFiles => ConvertedFiles.Count > 0;
-
-    #region ViewToggleButtons
-
-    [ObservableProperty] private bool _isCodeViewActive = false;
-
-    [RelayCommand]
-    private void SelectFileView() => IsCodeViewActive = false;
-
-    [RelayCommand]
-    private void SelectCodeView() => IsCodeViewActive = true;
-
-    #endregion
 
     #region FileConverter
 
     public ObservableCollection<ConvertedFile> ConvertedFiles { get; } = new();
+    public bool HasFiles => ConvertedFiles.Count > 0;
+
+    private void LoadExistingFiles()
+    {
+        if (!Directory.Exists(_workspaceDirectory)) return;
+
+        string[] files = Directory.GetFiles(_workspaceDirectory);
+        foreach (string path in files)
+        {
+            string fileName = Path.GetFileName(path);
+            if (fileName.StartsWith(".")) continue; // ignore hidden files
+
+            ConvertedFile newFile = ConvertedFile.FromPath(path);
+            ConvertedFiles.Add(newFile);
+        }
+    }
 
     public async Task ImportFilesAsync(string[] filePaths)
     {
         await Task.Run(() =>
         {
-            foreach (var path in filePaths)
+            foreach (string path in filePaths)
             {
                 try
                 {
                     string destinationPath = CopyToWorkspace(path);
-
-                    string formattedSize = GetFormattedFileSize(destinationPath);
-                    string fileName = Path.GetFileName(destinationPath);
                     string importTime = DateTime.Now.ToString("HH:mm:ss");
 
                     // TODO: MarkItDown
 
                     Dispatcher.UIThread.Post(() =>
                     {
-                        var newFile = new ConvertedFile(
-                            fileName,
-                            destinationPath,
-                            formattedSize,
-                            importTime
-                        );
+                        ConvertedFile newFile = ConvertedFile.FromPath(destinationPath, importTime);
                         ConvertedFiles.Add(newFile);
 
                         OnPropertyChanged(nameof(HasFiles));
@@ -98,21 +94,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     #endregion
 
-    #region Helpers
+    #region ViewToggleButtons
 
-    private string GetFormattedFileSize(string filePath)
-    {
-        var fileInfo = new FileInfo(filePath);
-        double bytes = fileInfo.Length;
+    [ObservableProperty] private bool _isCodeViewActive = false;
 
-        if (bytes < 1024)
-            return $"{bytes} B";
+    [RelayCommand]
+    private void SelectFileView() => IsCodeViewActive = false;
 
-        if (bytes < 1024 * 1024)
-            return $"{(bytes / 1024.0):F1} KB";
-
-        return $"{(bytes / (1024.0 * 1024.0)):F1} MB";
-    }
+    [RelayCommand]
+    private void SelectCodeView() => IsCodeViewActive = true;
 
     #endregion
 }
