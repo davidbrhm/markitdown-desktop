@@ -40,11 +40,8 @@
                     PointerPressed="OnDragDropBorderPointerPressed">
                 <Panel>
                     <!-- Dashed border -->
-                    <Rectangle Stroke="#444446"
-                               StrokeDashArray="4,4"
-                               StrokeThickness="2"
-                               RadiusX="12"
-                               RadiusY="12"
+                    <Rectangle Stroke="#444446" StrokeDashArray="4,4" StrokeThickness="2"
+                               RadiusX="12" RadiusY="12"
                                Margin="2" />
                     <!-- Empty state -->
                     <StackPanel IsVisible="{Binding !HasFiles}" VerticalAlignment="Center" HorizontalAlignment="Center"
@@ -63,17 +60,53 @@
                     <!-- Directory state -->
                     <ScrollViewer IsVisible="{Binding HasFiles}" Margin="16">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Workspace Files" FontSize="14" FontWeight="SemiBold" Foreground="#A1A1A6"
-                                       Margin="4,0,0,8" />
+                            <Grid ColumnDefinitions="*, Auto" Margin="4,0,0,8">
+                                <TextBlock Grid.Column="0" Text="Workspace Files" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="#A1A1A6" VerticalAlignment="Center" />
+
+                                <Button Grid.Column="1" Command="{Binding ClearWorkspaceCommand}"
+                                        Background="Transparent" BorderThickness="0" Padding="8,4" Cursor="Hand">
+                                    <Path Fill="#FF453A"
+                                          Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                                          Width="14" Height="14" Stretch="Uniform" />
+
+                                    <Button.Styles>
+                                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                            <Setter Property="Background" Value="#321212" />
+                                        </Style>
+                                    </Button.Styles>
+                                </Button>
+                            </Grid>
 
                             <ItemsControl ItemsSource="{Binding ConvertedFiles}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="models:ConvertedFile">
                                         <Grid ColumnDefinitions="*, Auto" Margin="0,4">
-                                            <TextBlock Text="{Binding Name}" Foreground="#FFFFFF" FontSize="13"
-                                                       TextTrimming="CharacterEllipsis" />
-                                            <TextBlock Grid.Column="1" Text="{Binding SizeText}" Foreground="#85858A"
-                                                       FontSize="11" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                            <Border Background="#1C1C1E" CornerRadius="8" Padding="14,12"
+                                                    BorderBrush="#2D2D30"
+                                                    BorderThickness="1" Cursor="Hand">
+                                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                                    <Path Grid.Column="0" Fill="#FFB900"
+                                                          Data="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
+                                                          Width="22" Height="22" Stretch="Uniform"
+                                                          VerticalAlignment="Center" />
+                                                    <StackPanel Grid.Column="1" Margin="14,0"
+                                                                VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="#FFFFFF" FontSize="13" />
+                                                        <TextBlock Text="{Binding SizeText}" Foreground="#85858A"
+                                                                   FontSize="11"
+                                                                   Margin="0,2,0,0" />
+                                                    </StackPanel>
+                                                    <!-- Drag indicator -->
+                                                    <Path Grid.Column="2" Fill="#A1A1A6"
+                                                          Data="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6v3H3l5 5 5-5h-3v-3zm2 5h4v3h3l-5 5-5-5h3v-3zm3-5h3V6h3l-5-5-5 5h3v4z"
+                                                          Width="14" Height="14" Stretch="Uniform"
+                                                          VerticalAlignment="Center"
+                                                          Opacity="0.5" />
+                                                </Grid>
+                                            </Border>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -110,12 +143,9 @@
                         IsVisible="{Binding IsCodeViewActive}"
                         Content="Copy to Clipboard"
                         HorizontalAlignment="Right"
-                        Background="#2D2D30"
-                        Foreground="#E1E1E6"
+                        Background="#2D2D30" Foreground="#E1E1E6"
                         Padding="16,8"
-                        CornerRadius="8"
-                        BorderBrush="#444446"
-                        BorderThickness="1">
+                        CornerRadius="8" BorderBrush="#444446" BorderThickness="1">
                     <Button.Styles>
                         <Style Selector="Button:pointerover /template/ ContentPresenter">
                             <Setter Property="Background" Value="#3D3D42" />
@@ -128,10 +158,8 @@
             <!-- Symmetric Output Container (Solid Border matching the Left Panel) -->
             <Border Grid.Row="1" Background="#252528" CornerRadius="12" ClipToBounds="True">
                 <Panel>
-                    <Rectangle Stroke="#444446"
-                               StrokeThickness="2"
-                               RadiusX="12"
-                               RadiusY="12"
+                    <Rectangle Stroke="#444446" StrokeThickness="2"
+                               RadiusX="12" RadiusY="12"
                                Margin="2" />
                     <Grid Margin="12">
 
@@ -187,15 +215,10 @@
                         <!-- VIEW: Code View -->
                         <TextBox IsVisible="{Binding IsCodeViewActive}"
                                  Text="CodeView"
-                                 AcceptsReturn="True"
-                                 TextWrapping="Wrap"
-                                 FontFamily="Consolas, Cascadia Code, monospace"
-                                 FontSize="13"
-                                 Background="Transparent"
-                                 Foreground="#E1E1E6"
-                                 BorderThickness="0"
-                                 Padding="8"
-                                 Margin="4" />
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 FontFamily="Consolas, Cascadia Code, monospace" FontSize="13"
+                                 Background="Transparent" Foreground="#E1E1E6"
+                                 BorderThickness="0" Padding="8" Margin="4" />
                     </Grid>
                 </Panel>
             </Border>

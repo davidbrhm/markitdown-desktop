@@ -105,4 +105,27 @@ public partial class MainWindowViewModel : ViewModelBase
     private void SelectCodeView() => IsCodeViewActive = true;
 
     #endregion
+
+    [RelayCommand]
+    private void ClearWorkspace()
+    {
+        try
+        {
+            if (!Directory.Exists(_workspaceDirectory)) return;
+
+            string[] files = Directory.GetFiles(_workspaceDirectory);
+            foreach (string filePath in files)
+            {
+                File.Delete(filePath);
+            }
+
+            ConvertedFiles.Clear();
+
+            OnPropertyChanged(nameof(HasFiles));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
 }
