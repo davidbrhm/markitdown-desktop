@@ -12,7 +12,8 @@
         WindowStartupLocation="CenterScreen"
         xmlns:vm="using:MarkItDownDesktop.ViewModels"
         x:DataType="vm:MainWindowViewModel"
-        xmlns:models="using:MarkItDownDesktop.Models">
+        xmlns:models="using:MarkItDownDesktop.Models"
+        KeyDown="OnWindowKeyDown">
 
     <Window.Styles>
         <!-- Custom hover and active styles for the toggle buttons -->
@@ -35,7 +36,8 @@
 
         <!-- LEFT PANEL: Import / Drag & Drop Zone -->
         <Grid Grid.Column="0" DragDrop.AllowDrop="True" DragDrop.DragOver="OnDragOver" DragDrop.Drop="OnDrop">
-            <Border Name="DragDropBorder" Background="#252528" CornerRadius="12" ClipToBounds="True">
+            <Border Name="DragDropBorder" Background="#252528" CornerRadius="12" ClipToBounds="True"
+                    PointerPressed="OnDragDropBorderPointerPressed">
                 <Panel>
                     <!-- Dashed border -->
                     <Rectangle Stroke="#444446"

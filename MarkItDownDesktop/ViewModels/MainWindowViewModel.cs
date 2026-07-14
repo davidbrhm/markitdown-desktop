@@ -36,7 +36,7 @@ public partial class MainWindowViewModel : ViewModelBase
         foreach (string path in files)
         {
             string fileName = Path.GetFileName(path);
-            if (fileName.StartsWith(".")) continue; // ignore hidden files
+            if (fileName.StartsWith('.')) continue; // ignore hidden files
 
             ConvertedFile newFile = ConvertedFile.FromPath(path);
             ConvertedFiles.Add(newFile);
