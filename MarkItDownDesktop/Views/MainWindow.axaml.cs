@@ -1,9 +1,11 @@
+using System;
 using Avalonia.Controls;
 using MarkItDownDesktop.ViewModels;
 using Avalonia.Input;
 using System.Linq;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
+using Avalonia.VisualTree;
 
 namespace MarkItDownDesktop.Views;
 
@@ -15,6 +17,7 @@ public partial class MainWindow : Window
     }
 
     // TODO: rename
+
     #region Workspace
 
     private void OnDragOver(object? sender, DragEventArgs e)
@@ -93,6 +96,17 @@ public partial class MainWindow : Window
                 await viewModel.ImportFilesAsync(filePaths);
             }
         }
+    }
+
+    #endregion
+
+    // TODO: name
+    #region Output
+
+    private void OnOutputListBoxPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        return;
+        throw new System.NotImplementedException();
     }
 
     #endregion

@@ -23,7 +23,7 @@ public partial class MainWindowViewModel : ViewModelBase
         LoadExistingFiles();
     }
 
-    #region FileConverter
+    #region LEFT PANEL: Import / Drag & Drop Zone
 
     public ObservableCollection<ConvertedFile> ConvertedFiles { get; } = new();
     public bool HasFiles => ConvertedFiles.Count > 0;
@@ -92,20 +92,6 @@ public partial class MainWindowViewModel : ViewModelBase
         return destPath;
     }
 
-    #endregion
-
-    #region ViewToggleButtons
-
-    [ObservableProperty] private bool _isCodeViewActive = false;
-
-    [RelayCommand]
-    private void SelectFileView() => IsCodeViewActive = false;
-
-    [RelayCommand]
-    private void SelectCodeView() => IsCodeViewActive = true;
-
-    #endregion
-
     [RelayCommand]
     private void ClearWorkspace()
     {
@@ -128,4 +114,29 @@ public partial class MainWindowViewModel : ViewModelBase
             Console.WriteLine(ex.Message);
         }
     }
+
+    #endregion
+
+    #region ViewToggleButtons
+
+    [ObservableProperty] private bool _isCodeViewActive = false;
+
+    [RelayCommand]
+    private void SelectFileView() => IsCodeViewActive = false;
+
+    [RelayCommand]
+    private void SelectCodeView() => IsCodeViewActive = false; // TODO: fix switch bug
+
+    #endregion
+
+    #region RIGHT PANEL:  Export / Preview Zone
+
+    [ObservableProperty] private ConvertedFile? _selectedFile;
+
+    partial void OnSelectedFileChanged(ConvertedFile? value)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
 }
