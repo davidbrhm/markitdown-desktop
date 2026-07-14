@@ -174,37 +174,34 @@
 
                             <ListBox.Styles>
                                 <Style Selector="ListBoxItem">
-                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Padding" Value="4" />
                                     <Setter Property="Margin" Value="0,4" />
+                                    <Setter Property="CornerRadius" Value="10" />
                                     <Setter Property="Background" Value="Transparent" />
                                 </Style>
 
                                 <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="Background" Value="#252528" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="1" />
                                 </Style>
+
                                 <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="Background" Value="#2D2D30" />
+                                    <Setter Property="BorderBrush" Value="#555558" />
+                                    <Setter Property="BorderThickness" Value="1" />
                                 </Style>
-                                <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="Transparent" />
-                                </Style>
+
                                 <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="Transparent" />
-                                </Style>
-
-                                <Style Selector="ListBoxItem:pointerover Border">
-                                    <Setter Property="Background" Value="#38383B" />
-                                    <Setter Property="BorderBrush" Value="#555558" />
-                                </Style>
-
-                                <Style Selector="ListBoxItem:selected Border">
-                                    <Setter Property="Background" Value="#2D2D30" />
-                                    <Setter Property="BorderBrush" Value="#444446" />
-                                </Style>
-
-                                <Style Selector="ListBoxItem:selected:pointerover Border">
                                     <Setter Property="Background" Value="#2D2D30" />
                                     <Setter Property="BorderBrush" Value="#555558" />
+                                    <Setter Property="BorderThickness" Value="1" />
+                                </Style>
+
+                                <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
+                                    <Setter Property="Background" Value="#333336" />
+                                    <Setter Property="BorderBrush" Value="#666669" />
+                                    <Setter Property="BorderThickness" Value="1" />
                                 </Style>
                             </ListBox.Styles>
 
@@ -250,6 +247,8 @@
                                  FontFamily="Consolas, Cascadia Code, monospace" FontSize="13"
                                  Background="Transparent" Foreground="#E1E1E6"
                                  BorderThickness="0" Padding="8" Margin="4" />
+
+                        <!-- TODO: MD viewer -->
                     </Grid>
                 </Panel>
             </Border>
