@@ -14,6 +14,7 @@
         x:DataType="vm:MainWindowViewModel"
         xmlns:models="using:MarkItDownDesktop.Models"
         xmlns:views="using:MarkItDownDesktop.Views"
+        xmlns:userControls="using:MarkItDownDesktop.Views.Components"
         KeyDown="OnWindowKeyDown">
 
     <Window.Styles>
@@ -90,7 +91,7 @@
                                     <DataTemplate x:DataType="models:ConvertedFile">
                                         <Border Background="#1C1C1E" CornerRadius="8" Padding="14,12"
                                                 BorderBrush="#2D2D30" BorderThickness="1" Cursor="Hand">
-                                            <views:FileItemControl IsOutbox="False" />
+                                            <userControls:FileItemControl IsOutbox="False" />
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -200,7 +201,7 @@
                                 <DataTemplate x:DataType="models:ConvertedFile">
                                     <Border Background="#1C1C1E" BorderBrush="#2D2D30"
                                             CornerRadius="8" Padding="14,12" BorderThickness="1" Cursor="Hand">
-                                        <views:FileItemControl IsOutbox="True" />
+                                        <userControls:FileItemControl IsOutbox="True" />
                                     </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

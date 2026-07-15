@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace MarkItDownDesktop.Views;
+namespace MarkItDownDesktop.Views.Components;
 
 public partial class FileItemControl : UserControl
 {

@@ -3,22 +3,22 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:models="clr-namespace:MarkItDownDesktop.Models"
-             xmlns:views="clr-namespace:MarkItDownDesktop.Views"
+             xmlns:components="clr-namespace:MarkItDownDesktop.Views.Components"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="MarkItDownDesktop.Views.FileItemControl"
+             x:Class="MarkItDownDesktop.Views.Components.FileItemControl"
              x:DataType="models:ConvertedFile">
 
     <Grid ColumnDefinitions="Auto, *, Auto">
 
         <!-- Inbox file icon -->
         <Path Grid.Column="0" Fill="#FFB900"
-              IsVisible="{Binding !$parent[views:FileItemControl].IsOutbox}"
+              IsVisible="{Binding !$parent[components:FileItemControl].IsOutbox}"
               Data="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
               Width="22" Height="22" Stretch="Uniform" VerticalAlignment="Center" />
 
         <!-- Outbox file icon -->
         <Path Grid.Column="0" Fill="#007AFF"
-              IsVisible="{Binding $parent[views:FileItemControl].IsOutbox}"
+              IsVisible="{Binding $parent[components:FileItemControl].IsOutbox}"
               Data="M2 3h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm2 3.5v11h2.75v-5.5L9 15l2.25-3v5.5H14v-11h-2.75L9 11.5L6.75 6.5H4zm14.5 0l-3.5 4h2.5v7h2v-7H22l-3.5-4z"
               Width="22" Height="22" Stretch="Uniform" VerticalAlignment="Center" />
 
