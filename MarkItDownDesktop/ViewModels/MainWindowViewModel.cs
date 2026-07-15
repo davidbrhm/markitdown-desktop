@@ -135,6 +135,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnSelectedFileChanged(ConvertedFile? value)
     {
+        return;
         throw new NotImplementedException();
     }
 

@@ -148,7 +148,8 @@
                     <Grid Margin="12">
 
                         <!-- VIEW: File View TODO: fix select style -->
-                        <ListBox Name="OutputListBox" PointerPressed="OnOutputListBoxPointerPressed"
+                        <ListBox Name="OutputListBox"
+                                 PointerPressed="OnOutputListBoxPointerPressed" PointerMoved="OnOutputListBoxPointerMoved"
                                  ItemsSource="{Binding ConvertedFiles}"
                                  SelectedItem="{Binding SelectedFile}"
                                  SelectionMode="Multiple, Toggle"

@@ -1,11 +1,15 @@
 using System;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using MarkItDownDesktop.ViewModels;
 using Avalonia.Input;
 using System.Linq;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
+using MarkItDownDesktop.Models;
 
 namespace MarkItDownDesktop.Views;
 
@@ -70,28 +74,62 @@ public partial class MainWindow : Window
         }
     }
 
+    #endregion
+
+    #region Keyboard Shortcuts
+
+    private async Task HandlePaste()
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel?.Clipboard is null) return;
+
+        var clipboardItems = await topLevel.Clipboard.TryGetFilesAsync();
+        if (clipboardItems is null) return;
+
+        string[] filePaths = clipboardItems
+            .Select(item => item.Path.LocalPath)
+            .Where(path => !string.IsNullOrEmpty(path))
+            .ToArray();
+
+        if (filePaths.Length > 0 && DataContext is MainWindowViewModel viewModel)
+        {
+            await viewModel.ImportFilesAsync(filePaths);
+        }
+    }
+
+    private async Task HandleCopy()
+    {
+        if (OutputListBox.SelectedItems?.Cast<ConvertedFile>().ToList() is { Count: > 0 } selectedFiles)
+        {
+            var filePaths = selectedFiles.Select(f => f.Path).ToArray();
+            var storageItems = await GetStorageItemsAsync(filePaths);
+
+            // TODO: 11.1
+            var dataObject = new DataObject();
+            dataObject.Set(DataFormats.Files, storageItems);
+
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel?.Clipboard is not null)
+            {
+                await topLevel.Clipboard.SetDataObjectAsync(dataObject);
+            }
+        }
+    }
+
     private async void OnWindowKeyDown(object? sender, KeyEventArgs e)
     {
-        bool isPastePressed = e.Key == Key.V &&
-                              (e.KeyModifiers.HasFlag(KeyModifiers.Meta) ||
-                               e.KeyModifiers.HasFlag(KeyModifiers.Control));
+        bool isModifierPressed = e.KeyModifiers.HasFlag(KeyModifiers.Meta) ||
+                                 e.KeyModifiers.HasFlag(KeyModifiers.Control);
 
-        if (isPastePressed)
+        if (isModifierPressed)
         {
-            var topLevel = TopLevel.GetTopLevel(this);
-            if (topLevel?.Clipboard is null) return;
-
-            var clipboardItems = await topLevel.Clipboard.TryGetFilesAsync();
-            if (clipboardItems is null) return;
-
-            string[] filePaths = clipboardItems
-                .Select(item => item.Path.LocalPath)
-                .Where(path => !string.IsNullOrEmpty(path))
-                .ToArray();
-
-            if (filePaths.Length > 0 && DataContext is MainWindowViewModel viewModel)
+            var key = e.Key;
+            switch (key)
             {
-                await viewModel.ImportFilesAsync(filePaths);
+                case Key.C:
+                    await HandleCopy(); break;
+                case Key.V:
+                    await HandlePaste(); break;
             }
         }
     }
@@ -101,10 +139,23 @@ public partial class MainWindow : Window
 
     #region Outbox
 
-    private void OnOutputListBoxPointerPressed(object? sender, PointerPressedEventArgs e)
+    private void OnOutputListBoxPointerMoved(object? sender, PointerEventArgs e)
     {
-        return;
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
+    }
+
+    private async void OnOutputListBoxPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task StartDragOut(PointerEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
     }
 
     #endregion
