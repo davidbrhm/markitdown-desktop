@@ -13,6 +13,7 @@
         xmlns:vm="using:MarkItDownDesktop.ViewModels"
         x:DataType="vm:MainWindowViewModel"
         xmlns:models="using:MarkItDownDesktop.Models"
+        xmlns:views="using:MarkItDownDesktop.Views"
         KeyDown="OnWindowKeyDown">
 
     <Window.Styles>
@@ -79,35 +80,18 @@
                             </Grid>
 
                             <ItemsControl ItemsSource="{Binding ConvertedFiles}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Spacing="8" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="models:ConvertedFile">
-                                        <Grid ColumnDefinitions="*, Auto" Margin="0,4">
-                                            <Border Background="#1C1C1E" CornerRadius="8" Padding="14,12"
-                                                    BorderBrush="#2D2D30"
-                                                    BorderThickness="1" Cursor="Hand">
-                                                <Grid ColumnDefinitions="Auto, *, Auto">
-                                                    <Path Grid.Column="0" Fill="#FFB900"
-                                                          Data="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
-                                                          Width="22" Height="22" Stretch="Uniform"
-                                                          VerticalAlignment="Center" />
-                                                    <StackPanel Grid.Column="1" Margin="14,0"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding Name}"
-                                                                   FontWeight="SemiBold"
-                                                                   Foreground="#FFFFFF" FontSize="13" />
-                                                        <TextBlock Text="{Binding SizeText}" Foreground="#85858A"
-                                                                   FontSize="11"
-                                                                   Margin="0,2,0,0" />
-                                                    </StackPanel>
-                                                    <!-- Drag indicator -->
-                                                    <Path Grid.Column="2" Fill="#A1A1A6"
-                                                          Data="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6v3H3l5 5 5-5h-3v-3zm2 5h4v3h3l-5 5-5-5h3v-3zm3-5h3V6h3l-5-5-5 5h3v4z"
-                                                          Width="14" Height="14" Stretch="Uniform"
-                                                          VerticalAlignment="Center"
-                                                          Opacity="0.5" />
-                                                </Grid>
-                                            </Border>
-                                        </Grid>
+                                        <Border Background="#1C1C1E" CornerRadius="8" Padding="14,12"
+                                                BorderBrush="#2D2D30" BorderThickness="1" Cursor="Hand">
+                                            <views:FileItemControl IsOutbox="False" />
+                                        </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -174,8 +158,8 @@
 
                             <ListBox.Styles>
                                 <Style Selector="ListBoxItem">
-                                    <Setter Property="Padding" Value="4" />
-                                    <Setter Property="Margin" Value="0,4" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="0,0" />
                                     <Setter Property="CornerRadius" Value="10" />
                                     <Setter Property="Background" Value="Transparent" />
                                 </Style>
@@ -207,34 +191,15 @@
 
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <StackPanel />
+                                    <StackPanel Spacing="8" />
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
 
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="models:ConvertedFile">
-                                    <Border Background="#1C1C1E" Cursor="Hand"
-                                            CornerRadius="8" Padding="14,12"
-                                            BorderBrush="#2D2D30" BorderThickness="1">
-                                        <Grid ColumnDefinitions="Auto, *, Auto">
-                                            <Path Grid.Column="0" Fill="#007AFF"
-                                                  Data="M2 3h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm2 3.5v11h2.75v-5.5L9 15l2.25-3v5.5H14v-11h-2.75L9 11.5L6.75 6.5H4zm14.5 0l-3.5 4h2.5v7h2v-7H22l-3.5-4z"
-                                                  Width="22" Height="22"
-                                                  Stretch="Uniform" VerticalAlignment="Center" />
-
-                                            <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold"
-                                                           Foreground="#FFFFFF" FontSize="13" />
-                                                <TextBlock Text="{Binding SizeText}" Foreground="#85858A" FontSize="11"
-                                                           Margin="0,2,0,0" />
-                                            </StackPanel>
-
-                                            <!-- Drag indicator -->
-                                            <Path Grid.Column="2" Fill="#A1A1A6"
-                                                  Data="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6v3H3l5 5 5-5h-3v-3zm2 5h4v3h3l-5 5-5-5h3v-3zm3-5h3V6h3l-5-5-5 5h3v4z"
-                                                  Width="14" Height="14" Stretch="Uniform" VerticalAlignment="Center"
-                                                  Opacity="0.5" />
-                                        </Grid>
+                                    <Border Background="#1C1C1E" BorderBrush="#2D2D30"
+                                            CornerRadius="8" Padding="14,12" BorderThickness="1" Cursor="Hand">
+                                        <views:FileItemControl IsOutbox="True" />
                                     </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

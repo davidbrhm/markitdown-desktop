@@ -16,9 +16,7 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    // TODO: rename
-
-    #region Workspace
+    #region Inbox
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
@@ -100,8 +98,8 @@ public partial class MainWindow : Window
 
     #endregion
 
-    // TODO: name
-    #region Output
+
+    #region Outbox
 
     private void OnOutputListBoxPointerPressed(object? sender, PointerPressedEventArgs e)
     {
