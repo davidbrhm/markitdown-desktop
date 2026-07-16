@@ -7,18 +7,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Input.Platform;
+using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
 using MarkItDownDesktop.Models;
 
 namespace MarkItDownDesktop.Views;
 
-// TODO: exception handling
 public partial class MainWindow : Window
 {
     public MainWindow()
     {
         InitializeComponent();
+        OutputListBox.AddHandler(PointerPressedEvent, OnOutputListBoxPointerPressed, RoutingStrategies.Tunnel);
     }
 
     #region Inbox
@@ -143,13 +144,18 @@ public partial class MainWindow : Window
 
             if (isModifierPressed)
             {
-                var key = e.Key;
-                switch (key)
+                switch (e.Key)
                 {
                     case Key.C:
-                        await HandleCopyAsync(); break;
+                        await HandleCopyAsync();
+                        break;
                     case Key.V:
-                        await HandlePasteAsync(); break;
+                        await HandlePasteAsync();
+                        break;
+                    case Key.A:
+                        OutputListBox.SelectAll();
+                        e.Handled = true;
+                        break;
                 }
             }
         }
@@ -161,21 +167,66 @@ public partial class MainWindow : Window
 
     #endregion
 
-
     #region Outbox
 
-    #region DragOut // TODO: highlight rethink
+    #region DragOut
 
     private Point _dragStartPoint;
     private bool _isDragging;
+    private ConvertedFile? _pressedItem;
+    private bool _isPressedItemAlreadySelected;
 
     private void OnOutputListBoxPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        var properties = e.GetCurrentPoint(this).Properties;
+        if (!properties.IsLeftButtonPressed) return;
+
+        _dragStartPoint = e.GetPosition(this);
+        _isDragging = false;
+        _pressedItem = null;
+        _isPressedItemAlreadySelected = false;
+
+        Visual? clickedVisual = e.Source as Visual;
+        ListBoxItem? listBoxItem = clickedVisual?.FindAncestorOfType<ListBoxItem>();
+
+        if (listBoxItem?.DataContext is ConvertedFile clickedFile)
         {
-            _dragStartPoint = e.GetPosition(this);
-            _isDragging = false;
+            _pressedItem = clickedFile;
+            var selectedFiles = OutputListBox.SelectedItems?.Cast<ConvertedFile>().ToList();
+
+            if (selectedFiles is not null && selectedFiles.Contains(clickedFile))
+            {
+                _isPressedItemAlreadySelected = true;
+
+                bool hasModifiers = e.KeyModifiers.HasFlag(KeyModifiers.Control) ||
+                                    e.KeyModifiers.HasFlag(KeyModifiers.Meta) ||
+                                    e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+
+                if (!hasModifiers)
+                {
+                    e.Handled = true;
+                }
+            }
         }
+    }
+
+    private void OnOutputListBoxPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (!_isDragging && _pressedItem is not null && _isPressedItemAlreadySelected)
+        {
+            bool hasModifiers = e.KeyModifiers.HasFlag(KeyModifiers.Control) ||
+                                e.KeyModifiers.HasFlag(KeyModifiers.Meta) ||
+                                e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+            if (!hasModifiers)
+            {
+                OutputListBox.SelectedItems?.Clear();
+                OutputListBox.SelectedItems?.Add(_pressedItem);
+            }
+        }
+
+        _pressedItem = null;
+        _isPressedItemAlreadySelected = false;
+        _isDragging = false;
     }
 
     private async void OnOutputListBoxPointerMoved(object? sender, PointerEventArgs e)
@@ -247,7 +298,6 @@ public partial class MainWindow : Window
 
     #endregion
 
-
     #region Helpers
 
     private async Task<IEnumerable<IStorageItem>> GetStorageItemsAsync(IEnumerable<string> filePaths)
@@ -258,7 +308,7 @@ public partial class MainWindow : Window
         var items = new List<IStorageItem>();
         foreach (var path in filePaths)
         {
-            var uri = new Uri("file://" + path);
+            var uri = new Uri(path);
             var storageFile = await topLevel.StorageProvider.TryGetFileFromPathAsync(uri);
 
             if (storageFile is not null)

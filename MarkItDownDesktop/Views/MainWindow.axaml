@@ -148,12 +148,13 @@
                                Margin="2" />
                     <Grid Margin="12">
 
-                        <!-- VIEW: File View TODO: fix select style -->
+                        <!-- VIEW: File View TODO: fix select style (+remove hover effect) -->
                         <ListBox Name="OutputListBox"
-                                 PointerPressed="OnOutputListBoxPointerPressed" PointerMoved="OnOutputListBoxPointerMoved"
+                                 PointerReleased="OnOutputListBoxPointerReleased"
+                                 PointerMoved="OnOutputListBoxPointerMoved"
                                  ItemsSource="{Binding ConvertedFiles}"
                                  SelectedItem="{Binding SelectedFile}"
-                                 SelectionMode="Multiple, Toggle"
+                                 SelectionMode="Multiple"
                                  Background="Transparent"
                                  BorderThickness="0"
                                  Padding="0">
