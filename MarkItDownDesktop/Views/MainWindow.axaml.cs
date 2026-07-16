@@ -13,6 +13,7 @@ using MarkItDownDesktop.Models;
 
 namespace MarkItDownDesktop.Views;
 
+// TODO: exception handling
 public partial class MainWindow : Window
 {
     public MainWindow()
@@ -32,45 +33,59 @@ public partial class MainWindow : Window
 
     private async void OnDrop(object? sender, DragEventArgs e)
     {
-        var storageItems = e.DataTransfer.TryGetFiles();
-        if (storageItems is null) return;
-
-        var filePaths = storageItems
-            .Select(file => file.Path.LocalPath)
-            .Where(path => !string.IsNullOrEmpty(path))
-            .ToArray();
-
-        if (filePaths.Length > 0 && DataContext is MainWindowViewModel viewModel)
+        try
         {
-            await viewModel.ImportFilesAsync(filePaths);
+            var storageItems = e.DataTransfer.TryGetFiles();
+            if (storageItems is null) return;
+
+            var filePaths = storageItems
+                .Select(file => file.Path.LocalPath)
+                .Where(path => !string.IsNullOrEmpty(path))
+                .ToArray();
+
+            if (filePaths.Length > 0 && DataContext is MainWindowViewModel viewModel)
+            {
+                await viewModel.ImportFilesAsync(filePaths);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
         }
     }
 
     private async void OnDragDropBorderPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        var pointerProperties = e.GetCurrentPoint(this).Properties;
-        if (!pointerProperties.IsLeftButtonPressed) return;
-
-        var topLevel = TopLevel.GetTopLevel(this);
-        if (topLevel is null) return;
-
-        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        try
         {
-            Title = "Choose files",
-            AllowMultiple = true
-        });
+            var pointerProperties = e.GetCurrentPoint(this).Properties;
+            if (!pointerProperties.IsLeftButtonPressed) return;
 
-        if (files.Count > 0)
-        {
-            string[] filePaths = files
-                .Select(file => file.Path.LocalPath)
-                .Where(path => !string.IsNullOrEmpty(path))
-                .ToArray();
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel is null) return;
 
-            if (DataContext is MainWindowViewModel viewModel)
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                await viewModel.ImportFilesAsync(filePaths);
+                Title = "Choose files",
+                AllowMultiple = true
+            });
+
+            if (files.Count > 0)
+            {
+                string[] filePaths = files
+                    .Select(file => file.Path.LocalPath)
+                    .Where(path => !string.IsNullOrEmpty(path))
+                    .ToArray();
+
+                if (DataContext is MainWindowViewModel viewModel)
+                {
+                    await viewModel.ImportFilesAsync(filePaths);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
         }
     }
 
@@ -78,7 +93,7 @@ public partial class MainWindow : Window
 
     #region Keyboard Shortcuts
 
-    private async Task HandlePaste()
+    private async Task HandlePasteAsync()
     {
         var topLevel = TopLevel.GetTopLevel(this);
         if (topLevel?.Clipboard is null) return;
@@ -97,40 +112,50 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task HandleCopy()
+    private async Task HandleCopyAsync()
     {
         if (OutputListBox.SelectedItems?.Cast<ConvertedFile>().ToList() is { Count: > 0 } selectedFiles)
         {
             var filePaths = selectedFiles.Select(f => f.Path).ToArray();
             var storageItems = await GetStorageItemsAsync(filePaths);
 
-            // TODO: 11.1
-            var dataObject = new DataObject();
-            dataObject.Set(DataFormats.Files, storageItems);
+            var dataObject = new DataTransfer();
+
+            foreach (var storageItem in storageItems)
+            {
+                dataObject.Add(DataTransferItem.CreateFile(storageItem));
+            }
 
             var topLevel = TopLevel.GetTopLevel(this);
             if (topLevel?.Clipboard is not null)
             {
-                await topLevel.Clipboard.SetDataObjectAsync(dataObject);
+                await topLevel.Clipboard.SetDataAsync(dataObject);
             }
         }
     }
 
     private async void OnWindowKeyDown(object? sender, KeyEventArgs e)
     {
-        bool isModifierPressed = e.KeyModifiers.HasFlag(KeyModifiers.Meta) ||
-                                 e.KeyModifiers.HasFlag(KeyModifiers.Control);
-
-        if (isModifierPressed)
+        try
         {
-            var key = e.Key;
-            switch (key)
+            bool isModifierPressed = e.KeyModifiers.HasFlag(KeyModifiers.Meta) ||
+                                     e.KeyModifiers.HasFlag(KeyModifiers.Control);
+
+            if (isModifierPressed)
             {
-                case Key.C:
-                    await HandleCopy(); break;
-                case Key.V:
-                    await HandlePaste(); break;
+                var key = e.Key;
+                switch (key)
+                {
+                    case Key.C:
+                        await HandleCopyAsync(); break;
+                    case Key.V:
+                        await HandlePasteAsync(); break;
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
         }
     }
 
@@ -139,23 +164,110 @@ public partial class MainWindow : Window
 
     #region Outbox
 
-    private void OnOutputListBoxPointerMoved(object? sender, PointerEventArgs e)
+    #region DragOut // TODO: highlight rethink
+
+    private Point _dragStartPoint;
+    private bool _isDragging;
+
+    private void OnOutputListBoxPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        throw new NotImplementedException();
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            _dragStartPoint = e.GetPosition(this);
+            _isDragging = false;
+        }
     }
 
-    private async void OnOutputListBoxPointerPressed(object? sender, PointerPressedEventArgs e)
+    private async void OnOutputListBoxPointerMoved(object? sender, PointerEventArgs e)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var point = e.GetCurrentPoint(this);
+
+            if (!point.Properties.IsLeftButtonPressed || _isDragging) return;
+
+            var currentPosition = e.GetPosition(this);
+            var diff = currentPosition - _dragStartPoint;
+
+            if (Math.Abs(diff.X) > 3 || Math.Abs(diff.Y) > 3)
+            {
+                _isDragging = true;
+                await StartDragOut(e);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
     }
 
     private async Task StartDragOut(PointerEventArgs e)
     {
-        throw new NotImplementedException();
+        try
+        {
+            Visual? clickedVisual = e.Source as Visual;
+            ListBoxItem? listBoxItem = clickedVisual?.FindAncestorOfType<ListBoxItem>();
+
+            if (listBoxItem is null) return;
+
+            var selectedFiles = OutputListBox.SelectedItems?.Cast<ConvertedFile>().ToList();
+            var clickedFile = listBoxItem.DataContext as ConvertedFile;
+
+            if (clickedFile is null) return;
+
+            if (selectedFiles is null || !selectedFiles.Contains(clickedFile))
+            {
+                selectedFiles = new List<ConvertedFile> { clickedFile };
+            }
+
+            if (selectedFiles.Count == 0) return;
+
+            var filePaths = selectedFiles.Select(f => f.Path).ToArray();
+            var storageItems = await GetStorageItemsAsync(filePaths);
+
+            var dataObject = new DataTransfer();
+            foreach (var storageItem in storageItems)
+            {
+                dataObject.Add(DataTransferItem.CreateFile(storageItem));
+            }
+
+            await DragDrop.DoDragDropAsync(e, dataObject, DragDropEffects.Copy);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            _isDragging = false;
+        }
     }
 
     #endregion
 
+    #endregion
+
+
+    #region Helpers
+
+    private async Task<IEnumerable<IStorageItem>> GetStorageItemsAsync(IEnumerable<string> filePaths)
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel is null) return Array.Empty<IStorageItem>();
+
+        var items = new List<IStorageItem>();
+        foreach (var path in filePaths)
+        {
+            var uri = new Uri("file://" + path);
+            var storageFile = await topLevel.StorageProvider.TryGetFileFromPathAsync(uri);
+
+            if (storageFile is not null)
+            {
+                items.Add(storageFile);
+            }
+        }
+
+        return items;
     }
 
     #endregion
