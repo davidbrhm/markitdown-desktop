@@ -1,24 +1,14 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="650"
-        Width="1100" Height="650"
-        MinWidth="750" MinHeight="450"
-        x:Class="MarkItDownDesktop.Views.MainWindow"
-        Title="MarkItDown Desktop"
-        Background="#1C1C1E"
-        RequestedThemeVariant="Dark"
-        WindowStartupLocation="CenterScreen"
         xmlns:vm="using:MarkItDownDesktop.ViewModels"
-        x:DataType="vm:MainWindowViewModel"
-        xmlns:models="using:MarkItDownDesktop.Models"
-        xmlns:views="using:MarkItDownDesktop.Views"
         xmlns:userControls="using:MarkItDownDesktop.Views.Components"
+        x:Class="MarkItDownDesktop.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="MarkItDown Desktop" Width="1100" Height="650" MinWidth="750" MinHeight="450"
+        Background="#1C1C1E" RequestedThemeVariant="Dark" WindowStartupLocation="CenterScreen"
         KeyDown="OnWindowKeyDown">
 
     <Window.Styles>
-        <!-- Custom hover and active styles for the toggle buttons -->
         <Style Selector="Button.ToggleActive">
             <Setter Property="Background" Value="#2D2D30" />
             <Setter Property="Foreground" Value="#FFFFFF" />
@@ -35,191 +25,10 @@
     </Window.Styles>
 
     <Grid ColumnDefinitions="*, 8, *" Margin="24">
-
-        <!-- LEFT PANEL: Import / Drag & Drop Zone -->
-        <Grid Grid.Column="0" DragDrop.AllowDrop="True" DragDrop.DragOver="OnDragOver" DragDrop.Drop="OnDrop">
-            <Border Name="DragDropBorder" Background="#252528" CornerRadius="12" ClipToBounds="True"
-                    PointerPressed="OnDragDropBorderPointerPressed" Cursor="Hand">
-                <Panel>
-                    <!-- Dashed border -->
-                    <Rectangle Stroke="#444446" StrokeDashArray="4,4" StrokeThickness="2"
-                               RadiusX="12" RadiusY="12"
-                               Margin="2" />
-                    <!-- Empty state -->
-                    <StackPanel IsVisible="{Binding !HasFiles}" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                Spacing="16">
-                        <Viewbox Width="64" Height="64">
-                            <Path Fill="#A1A1A6"
-                                  Data="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-2 16l-4-4h3V10h2v4h3l-4 4zm1-9V3.5L18.5 9H13z" />
-                        </Viewbox>
-                        <TextBlock Text="Drag &amp; Drop File Here" FontSize="18" FontWeight="SemiBold"
-                                   Foreground="#FFFFFF" HorizontalAlignment="Center" />
-                        <TextBlock Text="Supported: PDF, DOCX, XLSX, PPTX, HTML, Audio, Images" FontSize="12"
-                                   Foreground="#A1A1A6" HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="300"
-                                   TextAlignment="Center" />
-                    </StackPanel>
-
-                    <!-- Directory state -->
-                    <ScrollViewer IsVisible="{Binding HasFiles}" Margin="16">
-                        <StackPanel Spacing="8">
-                            <Grid ColumnDefinitions="*, Auto" Margin="4,0,0,8">
-                                <TextBlock Grid.Column="0" Text="Workspace Files" FontSize="14" FontWeight="SemiBold"
-                                           Foreground="#A1A1A6" VerticalAlignment="Center" />
-
-                                <Button Grid.Column="1" Command="{Binding ClearWorkspaceCommand}"
-                                        Background="Transparent" BorderThickness="0" Padding="8,4" Cursor="Hand">
-                                    <Path Fill="#FF453A"
-                                          Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                                          Width="14" Height="14" Stretch="Uniform" />
-
-                                    <Button.Styles>
-                                        <Style Selector="Button:pointerover /template/ ContentPresenter">
-                                            <Setter Property="Background" Value="#321212" />
-                                        </Style>
-                                    </Button.Styles>
-                                </Button>
-                            </Grid>
-
-                            <ItemsControl ItemsSource="{Binding ConvertedFiles}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Spacing="8" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="models:ConvertedFile">
-                                        <Border Background="#1C1C1E" CornerRadius="8" Padding="14,12"
-                                                BorderBrush="#2D2D30" BorderThickness="1" Cursor="Hand">
-                                            <userControls:FileItemControl IsOutbox="False" />
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </ScrollViewer>
-                </Panel>
-            </Border>
-        </Grid>
+        <userControls:InboxView Grid.Column="0" />
 
         <GridSplitter Grid.Column="1" Background="Transparent" Width="8" />
 
-        <!-- RIGHT PANEL:  Export / Preview Zone -->
-        <Grid Grid.Column="2" RowDefinitions="Auto, *">
-            <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,16">
-                <Border Grid.Column="0" Background="#252528" CornerRadius="8" Padding="3" BorderBrush="#333335"
-                        BorderThickness="1">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Button Command="{Binding SelectFileViewCommand}"
-                                Classes.ToggleActive="{Binding !IsCodeViewActive}"
-                                Classes.ToggleInactive="{Binding IsCodeViewActive}"
-                                Content="File View" Padding="16,8" CornerRadius="6"
-                                BorderThickness="0" />
-                        <Button Command="{Binding SelectCodeViewCommand}"
-                                Classes.ToggleActive="{Binding IsCodeViewActive}"
-                                Classes.ToggleInactive="{Binding !IsCodeViewActive}"
-                                Content="Code View" Padding="16,8"
-                                CornerRadius="6"
-                                BorderThickness="0" />
-                    </StackPanel>
-                </Border>
-
-                <Button Grid.Column="1"
-                        IsVisible="{Binding IsCodeViewActive}"
-                        Content="Copy to Clipboard"
-                        HorizontalAlignment="Right"
-                        Background="#2D2D30" Foreground="#E1E1E6"
-                        Padding="16,8"
-                        CornerRadius="8" BorderBrush="#444446" BorderThickness="1">
-                    <Button.Styles>
-                        <Style Selector="Button:pointerover /template/ ContentPresenter">
-                            <Setter Property="Background" Value="#3D3D42" />
-                            <Setter Property="BorderBrush" Value="#555558" />
-                        </Style>
-                    </Button.Styles>
-                </Button>
-            </Grid>
-
-            <!-- Symmetric Output Container (Solid Border matching the Left Panel) -->
-            <Border Grid.Row="1" Background="#252528" CornerRadius="12" ClipToBounds="True">
-                <Panel>
-                    <Rectangle Stroke="#444446" StrokeThickness="2"
-                               RadiusX="12" RadiusY="12"
-                               Margin="2" />
-                    <Grid Margin="12">
-
-                        <!-- VIEW: File View TODO: fix select style (+remove hover effect) -->
-                        <ListBox Name="OutputListBox"
-                                 PointerReleased="OnOutputListBoxPointerReleased"
-                                 PointerMoved="OnOutputListBoxPointerMoved"
-                                 ItemsSource="{Binding ConvertedFiles}"
-                                 SelectedItem="{Binding SelectedFile}"
-                                 SelectionMode="Multiple"
-                                 Background="Transparent"
-                                 BorderThickness="0"
-                                 Padding="0">
-
-                            <ListBox.Styles>
-                                <Style Selector="ListBoxItem">
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="Margin" Value="0,0" />
-                                    <Setter Property="CornerRadius" Value="10" />
-                                    <Setter Property="Background" Value="Transparent" />
-                                </Style>
-
-                                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="#252528" />
-                                    <Setter Property="BorderBrush" Value="Transparent" />
-                                    <Setter Property="BorderThickness" Value="1" />
-                                </Style>
-
-                                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="#2D2D30" />
-                                    <Setter Property="BorderBrush" Value="#555558" />
-                                    <Setter Property="BorderThickness" Value="1" />
-                                </Style>
-
-                                <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="#2D2D30" />
-                                    <Setter Property="BorderBrush" Value="#555558" />
-                                    <Setter Property="BorderThickness" Value="1" />
-                                </Style>
-
-                                <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="#333336" />
-                                    <Setter Property="BorderBrush" Value="#666669" />
-                                    <Setter Property="BorderThickness" Value="1" />
-                                </Style>
-                            </ListBox.Styles>
-
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Spacing="8" />
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
-
-                            <ListBox.ItemTemplate>
-                                <DataTemplate x:DataType="models:ConvertedFile">
-                                    <Border Background="#1C1C1E" BorderBrush="#2D2D30"
-                                            CornerRadius="8" Padding="14,12" BorderThickness="1" Cursor="Hand">
-                                        <userControls:FileItemControl IsOutbox="True" />
-                                    </Border>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-
-                        <!-- VIEW: Code View -->
-                        <TextBox IsVisible="{Binding IsCodeViewActive}"
-                                 Text="CodeView"
-                                 AcceptsReturn="True" TextWrapping="Wrap"
-                                 FontFamily="Consolas, Cascadia Code, monospace" FontSize="13"
-                                 Background="Transparent" Foreground="#E1E1E6"
-                                 BorderThickness="0" Padding="8" Margin="4" />
-
-                        <!-- TODO: MD viewer -->
-                    </Grid>
-                </Panel>
-            </Border>
-        </Grid>
+        <userControls:OutboxView x:Name="OutboxComponent" Grid.Column="2" />
     </Grid>
 </Window>

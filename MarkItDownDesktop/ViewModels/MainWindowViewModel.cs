@@ -23,7 +23,7 @@ public partial class MainWindowViewModel : ViewModelBase
         LoadExistingFiles();
     }
 
-    #region LEFT PANEL: Import / Drag & Drop Zone
+    #region Inbox
 
     public ObservableCollection<ConvertedFile> ConvertedFiles { get; } = new();
     public bool HasFiles => ConvertedFiles.Count > 0;
@@ -129,9 +129,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
     #endregion
 
-    #region RIGHT PANEL:  Export / Preview Zone
+    #region Outbox
 
     [ObservableProperty] private ConvertedFile? _selectedFile;
+    [ObservableProperty] private string _codeViewText = string.Empty;
 
     partial void OnSelectedFileChanged(ConvertedFile? value)
     {
