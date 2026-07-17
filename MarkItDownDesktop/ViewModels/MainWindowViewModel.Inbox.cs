@@ -10,7 +10,6 @@ namespace MarkItDownDesktop.ViewModels;
 
 public partial class MainWindowViewModel
 {
-
     public ObservableCollection<ConvertedFile> ConvertedFiles { get; } = new();
     public bool HasFiles => ConvertedFiles.Count > 0;
 
@@ -100,5 +99,4 @@ public partial class MainWindowViewModel
             Console.WriteLine(ex.Message);
         }
     }
-
 }

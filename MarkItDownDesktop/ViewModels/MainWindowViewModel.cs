@@ -19,5 +19,4 @@ public partial class MainWindowViewModel : ViewModelBase
 
         LoadExistingFiles();
     }
-
 }

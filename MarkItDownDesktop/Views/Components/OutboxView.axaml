@@ -8,10 +8,16 @@
 
     <Grid RowDefinitions="Auto, *">
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,16">
-            <Border Grid.Column="0" Background="#252528" CornerRadius="8" Padding="3" BorderBrush="#333335" BorderThickness="1">
+            <Border Grid.Column="0" Background="#252528" CornerRadius="8" Padding="3" BorderBrush="#333335"
+                    BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="4">
-                    <Button Command="{Binding SelectFileViewCommand}" Classes.ToggleActive="{Binding !IsCodeViewActive}" Classes.ToggleInactive="{Binding IsCodeViewActive}" Content="File View" Padding="16,8" CornerRadius="6" BorderThickness="0" />
-                    <Button Command="{Binding SelectCodeViewCommand}" Classes.ToggleActive="{Binding IsCodeViewActive}" Classes.ToggleInactive="{Binding !IsCodeViewActive}" Content="Code View" Padding="16,8" CornerRadius="6" BorderThickness="0" />
+                    <Button Command="{Binding SelectFileViewCommand}"
+                            Classes.ToggleActive="{Binding !IsCodeViewActive}"
+                            Classes.ToggleInactive="{Binding IsCodeViewActive}" Content="File View" Padding="16,8"
+                            CornerRadius="6" BorderThickness="0" />
+                    <Button Command="{Binding SelectCodeViewCommand}" Classes.ToggleActive="{Binding IsCodeViewActive}"
+                            Classes.ToggleInactive="{Binding !IsCodeViewActive}" Content="Code View" Padding="16,8"
+                            CornerRadius="6" BorderThickness="0" />
                 </StackPanel>
             </Border>
         </Grid>
@@ -21,7 +27,7 @@
                 <!-- Style separation? -->
                 <Rectangle Stroke="#444446" StrokeThickness="2" RadiusX="12" RadiusY="12" Margin="2" />
                 <Grid Margin="12">
-                    <!-- VIEW: File View TODO: fix select style: remove hover effect && highlight rethink -->
+                    <!-- VIEW: File View -->
                     <ListBox Name="OutputListBox"
                              PointerReleased="OnOutputListBoxPointerReleased"
                              PointerMoved="OnOutputListBoxPointerMoved"
@@ -35,28 +41,52 @@
                             <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
                                 <Setter Property="Margin" Value="0,0" />
-                                <Setter Property="CornerRadius" Value="10" />
-                                <Setter Property="Background" Value="Transparent" />
                             </Style>
-                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                                <Setter Property="Background" Value="#252528" />
+
+                            <Style Selector="ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+                                <Setter Property="BorderThickness" Value="2" />
                                 <Setter Property="BorderBrush" Value="Transparent" />
-                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="CornerRadius" Value="10" />
                             </Style>
-                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                <Setter Property="Background" Value="#2D2D30" />
-                                <Setter Property="BorderBrush" Value="#555558" />
-                                <Setter Property="BorderThickness" Value="1" />
+
+                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="CornerRadius" Value="10" />
                             </Style>
-                            <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
-                                <Setter Property="Background" Value="#2D2D30" />
-                                <Setter Property="BorderBrush" Value="#555558" />
-                                <Setter Property="BorderThickness" Value="1" />
+                            <Style Selector="ListBoxItem:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="CornerRadius" Value="10" />
                             </Style>
-                            <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
-                                <Setter Property="Background" Value="#333336" />
-                                <Setter Property="BorderBrush" Value="#666669" />
-                                <Setter Property="BorderThickness" Value="1" />
+
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+                                <Setter Property="BorderThickness" Value="2" />
+                                <Setter Property="BorderBrush" Value="#0A84FF" />
+                                <Setter Property="Background" Value="#222225" />
+                                <Setter Property="CornerRadius" Value="10" />
+                            </Style>
+                            <Style
+                                Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                <Setter Property="BorderThickness" Value="2" />
+                                <Setter Property="BorderBrush" Value="#0A84FF" />
+                                <Setter Property="Background" Value="#252528" />
+                                <Setter Property="CornerRadius" Value="10" />
+                            </Style>
+                            <Style
+                                Selector="ListBoxItem:selected:focus /template/ ContentPresenter#PART_ContentPresenter">
+                                <Setter Property="BorderThickness" Value="2" />
+                                <Setter Property="BorderBrush" Value="#0A84FF" />
+                                <Setter Property="Background" Value="#252528" />
+                                <Setter Property="CornerRadius" Value="10" />
+                            </Style>
+                            <Style
+                                Selector="ListBoxItem:selected:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                                <Setter Property="BorderThickness" Value="2" />
+                                <Setter Property="BorderBrush" Value="#0A84FF" />
+                                <Setter Property="Background" Value="#252528" />
+                                <Setter Property="CornerRadius" Value="10" />
                             </Style>
                         </ListBox.Styles>
                         <ListBox.ItemsPanel>
@@ -66,7 +96,8 @@
                         </ListBox.ItemsPanel>
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="models:ConvertedFile">
-                                <Border Background="#1C1C1E" BorderBrush="#2D2D30" CornerRadius="8" Padding="14,12" BorderThickness="1" Cursor="Hand">
+                                <Border Background="#1C1C1E" BorderBrush="#2D2D30" CornerRadius="8" Padding="14,12"
+                                        BorderThickness="1" Cursor="Hand">
                                     <userControls:FileItemControl IsOutbox="True" />
                                 </Border>
                             </DataTemplate>

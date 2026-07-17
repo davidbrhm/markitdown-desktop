@@ -17,7 +17,6 @@ public partial class MainWindowViewModel
     private void SelectCodeView() => IsCodeViewActive = false;
 
 
-
     [ObservableProperty] private ConvertedFile? _selectedFile;
     [ObservableProperty] private string _codeViewText = string.Empty;
 
@@ -26,6 +25,4 @@ public partial class MainWindowViewModel
         return;
         throw new NotImplementedException();
     }
-
-
 }
