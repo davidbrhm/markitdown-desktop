@@ -6,6 +6,13 @@
              x:Class="MarkItDownDesktop.Views.Components.OutboxView"
              x:DataType="vm:MainWindowViewModel">
 
+    <UserControl.Styles>
+        <Style Selector="Button:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#555558" />
+        </Style> 
+    </UserControl.Styles>
+
     <Grid RowDefinitions="Auto, *">
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,16">
             <Border Grid.Column="0" Background="#252528" CornerRadius="8" Padding="3" BorderBrush="#333335"
@@ -13,10 +20,15 @@
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <Button Command="{Binding SelectFileViewCommand}"
                             Classes.ToggleActive="{Binding !IsCodeViewActive}"
-                            Classes.ToggleInactive="{Binding IsCodeViewActive}" Content="File View" Padding="16,8"
+                            Classes.ToggleInactive="{Binding IsCodeViewActive}"
+                            Content="File View" Padding="16,8"
                             CornerRadius="6" BorderThickness="0" />
-                    <Button Command="{Binding SelectCodeViewCommand}" Classes.ToggleActive="{Binding IsCodeViewActive}"
-                            Classes.ToggleInactive="{Binding !IsCodeViewActive}" Content="Code View" Padding="16,8"
+
+                    <Button Command="{Binding SelectCodeViewCommand}"
+                            IsEnabled="{Binding SelectedFile, Converter={x:Static ObjectConverters.IsNotNull}}"
+                            Classes.ToggleActive="{Binding IsCodeViewActive}"
+                            Classes.ToggleInactive="{Binding !IsCodeViewActive}"
+                            Content="Code View" Padding="16,8"
                             CornerRadius="6" BorderThickness="0" />
                 </StackPanel>
             </Border>
@@ -24,15 +36,15 @@
 
         <Border Grid.Row="1" Background="#252528" CornerRadius="12" ClipToBounds="True">
             <Panel>
-                <!-- Style separation? -->
                 <Rectangle Stroke="#444446" StrokeThickness="2" RadiusX="12" RadiusY="12" Margin="2" />
                 <Grid Margin="12">
                     <!-- VIEW: File View -->
                     <ListBox Name="OutputListBox"
+                             SelectionChanged="OnOutputListBoxSelectionChanged"
                              PointerReleased="OnOutputListBoxPointerReleased"
                              PointerMoved="OnOutputListBoxPointerMoved"
+                             IsVisible="{Binding !IsCodeViewActive}"
                              ItemsSource="{Binding ConvertedFiles}"
-                             SelectedItem="{Binding SelectedFile}"
                              SelectionMode="Multiple"
                              Background="Transparent"
                              BorderThickness="0"
@@ -104,16 +116,22 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <!-- TODO: MD viewer -->
-
                     <!-- VIEW: Code View -->
                     <TextBox IsVisible="{Binding IsCodeViewActive}"
                              Text="{Binding CodeViewText}"
+                             IsReadOnly="True"
                              IsEnabled="{Binding SelectedFile, Converter={x:Static ObjectConverters.IsNotNull}}"
-                             AcceptsReturn="True" TextWrapping="Wrap"
-                             FontFamily="Consolas, Cascadia Code, monospace" FontSize="13"
-                             Background="Transparent" Foreground="#E1E1E6"
-                             BorderThickness="0" Padding="8" Margin="4" />
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             FontFamily="Consolas, Cascadia Code, monospace"
+                             FontSize="13"
+                             Background="Transparent"
+                             Foreground="#E1E1E6"
+                             BorderThickness="0"
+                             Padding="8"
+                             Margin="4" />
+
+                    <!-- TODO: MD viewer -->
                 </Grid>
             </Panel>
         </Border>

@@ -9,6 +9,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
 using MarkItDownDesktop.Models;
+using MarkItDownDesktop.ViewModels;
 
 namespace MarkItDownDesktop.Views.Components;
 
@@ -156,5 +157,24 @@ public partial class OutboxView : UserControl
         }
 
         return items;
+    }
+
+    private async void OnOutputListBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        try
+        {
+            if (DataContext is MainWindowViewModel viewModel)
+            {
+                var selectedItems = OutputListBox.SelectedItems?
+                    .Cast<ConvertedFile>()
+                    .ToList() ?? new List<ConvertedFile>();
+
+                await viewModel.UpdatePreviewAsync(selectedItems);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
     }
 }
