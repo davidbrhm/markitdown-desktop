@@ -20,8 +20,8 @@ public partial class OutboxView : UserControl
     private bool _isDragging;
     private ConvertedFile? _pressedItem;
     private bool _isPressedItemAlreadySelected;
-
     private bool _isUpdatingText;
+    private MainWindowViewModel? _currentViewModel;
 
     public OutboxView()
     {
@@ -32,22 +32,32 @@ public partial class OutboxView : UserControl
         DataContextChanged += OnDataContextChanged;
     }
 
+    public void SelectAll() => OutputListBox.SelectAll();
+
+    public IEnumerable<ConvertedFile> GetSelectedFiles()
+    {
+        return OutputListBox.SelectedItems?.Cast<ConvertedFile>() ?? [];
+    }
+
     private void OnDataContextChanged(object? sender, EventArgs e)
     {
-        if (DataContext is MainWindowViewModel viewModel)
-        {
-            viewModel.PropertyChanged -= OnViewModelPropertyChanged;
-            viewModel.PropertyChanged += OnViewModelPropertyChanged;
+        if (_currentViewModel is not null)
+            _currentViewModel.PropertyChanged -= OnViewModelPropertyChanged;
 
-            SyncTextFromViewModel(viewModel.CodeViewText);
+        _currentViewModel = DataContext as MainWindowViewModel;
+
+        if (_currentViewModel is not null)
+        {
+            _currentViewModel.PropertyChanged += OnViewModelPropertyChanged;
+            SyncTextFromViewModel(_currentViewModel.CodeViewText);
         }
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainWindowViewModel.CodeViewText) && DataContext is MainWindowViewModel viewModel)
+        if (e.PropertyName == nameof(MainWindowViewModel.CodeViewText) && _currentViewModel is not null)
         {
-            SyncTextFromViewModel(viewModel.CodeViewText);
+            SyncTextFromViewModel(_currentViewModel.CodeViewText);
         }
     }
 
@@ -75,12 +85,12 @@ public partial class OutboxView : UserControl
     {
         if (_isUpdatingText) return;
 
-        if (DataContext is MainWindowViewModel viewModel)
+        if (_currentViewModel is not null)
         {
             _isUpdatingText = true;
             try
             {
-                viewModel.CodeViewText = CodeEditor.Text ?? string.Empty;
+                _currentViewModel.CodeViewText = CodeEditor.Text ?? string.Empty;
             }
             finally
             {
@@ -89,11 +99,23 @@ public partial class OutboxView : UserControl
         }
     }
 
-    public void SelectAll() => OutputListBox.SelectAll();
-
-    public IEnumerable<ConvertedFile> GetSelectedFiles()
+    private async void OnOutputListBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        return OutputListBox.SelectedItems?.Cast<ConvertedFile>() ?? Array.Empty<ConvertedFile>();
+        try
+        {
+            if (_currentViewModel is not null)
+            {
+                var selectedItems = OutputListBox.SelectedItems?
+                    .Cast<ConvertedFile>()
+                    .ToList() ?? [];
+
+                await _currentViewModel.UpdatePreviewAsync(selectedItems);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
     }
 
     private void OnOutputListBoxPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -166,6 +188,7 @@ public partial class OutboxView : UserControl
         }
     }
 
+
     private async Task StartDragOut(PointerEventArgs e)
     {
         try
@@ -180,7 +203,7 @@ public partial class OutboxView : UserControl
 
             if (selectedFiles is null || !selectedFiles.Contains(clickedFile))
             {
-                selectedFiles = new List<ConvertedFile> { clickedFile };
+                selectedFiles = [clickedFile];
             }
 
             if (selectedFiles.Count == 0) return;
@@ -209,7 +232,7 @@ public partial class OutboxView : UserControl
     private async Task<IEnumerable<IStorageItem>> GetStorageItemsAsync(IEnumerable<string> filePaths)
     {
         var topLevel = TopLevel.GetTopLevel(this);
-        if (topLevel is null) return Array.Empty<IStorageItem>();
+        if (topLevel is null) return [];
 
         var items = new List<IStorageItem>();
         foreach (var path in filePaths)
@@ -220,24 +243,5 @@ public partial class OutboxView : UserControl
         }
 
         return items;
-    }
-
-    private async void OnOutputListBoxSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        try
-        {
-            if (DataContext is MainWindowViewModel viewModel)
-            {
-                var selectedItems = OutputListBox.SelectedItems?
-                    .Cast<ConvertedFile>()
-                    .ToList() ?? new List<ConvertedFile>();
-
-                await viewModel.UpdatePreviewAsync(selectedItems);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-        }
     }
 }
