@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -20,10 +21,72 @@ public partial class OutboxView : UserControl
     private ConvertedFile? _pressedItem;
     private bool _isPressedItemAlreadySelected;
 
+    private bool _isUpdatingText;
+
     public OutboxView()
     {
         InitializeComponent();
         OutputListBox.AddHandler(PointerPressedEvent, OnOutputListBoxPointerPressed, RoutingStrategies.Tunnel);
+
+        CodeEditor.TextChanged += OnCodeEditorTextChanged;
+        DataContextChanged += OnDataContextChanged;
+    }
+
+    private void OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+            viewModel.PropertyChanged += OnViewModelPropertyChanged;
+
+            SyncTextFromViewModel(viewModel.CodeViewText);
+        }
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainWindowViewModel.CodeViewText) && DataContext is MainWindowViewModel viewModel)
+        {
+            SyncTextFromViewModel(viewModel.CodeViewText);
+        }
+    }
+
+    private void SyncTextFromViewModel(string? text)
+    {
+        if (_isUpdatingText) return;
+
+        _isUpdatingText = true;
+        try
+        {
+            string newText = text ?? string.Empty;
+
+            if (CodeEditor.Document is null)
+                CodeEditor.Document = new AvaloniaEdit.Document.TextDocument(newText);
+            else if (CodeEditor.Text != newText)
+                CodeEditor.Text = newText;
+        }
+        finally
+        {
+            _isUpdatingText = false;
+        }
+    }
+
+    private void OnCodeEditorTextChanged(object? sender, EventArgs e)
+    {
+        if (_isUpdatingText) return;
+
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            _isUpdatingText = true;
+            try
+            {
+                viewModel.CodeViewText = CodeEditor.Text ?? string.Empty;
+            }
+            finally
+            {
+                _isUpdatingText = false;
+            }
+        }
     }
 
     public void SelectAll() => OutputListBox.SelectAll();

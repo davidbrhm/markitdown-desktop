@@ -4,13 +4,14 @@
              xmlns:models="using:MarkItDownDesktop.Models"
              xmlns:userControls="using:MarkItDownDesktop.Views.Components"
              x:Class="MarkItDownDesktop.Views.Components.OutboxView"
-             x:DataType="vm:MainWindowViewModel">
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit">
 
     <UserControl.Styles>
         <Style Selector="Button:disabled /template/ ContentPresenter">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="#555558" />
-        </Style> 
+        </Style>
     </UserControl.Styles>
 
     <Grid RowDefinitions="Auto, *">
@@ -117,19 +118,17 @@
                     </ListBox>
 
                     <!-- VIEW: Code View -->
-                    <TextBox IsVisible="{Binding IsCodeViewActive}"
-                             Text="{Binding CodeViewText}"
-                             IsReadOnly="True"
-                             IsEnabled="{Binding SelectedFile, Converter={x:Static ObjectConverters.IsNotNull}}"
-                             AcceptsReturn="True"
-                             TextWrapping="Wrap"
-                             FontFamily="Consolas, Cascadia Code, monospace"
-                             FontSize="13"
-                             Background="Transparent"
-                             Foreground="#E1E1E6"
-                             BorderThickness="0"
-                             Padding="8"
-                             Margin="4" />
+                    <avaloniaEdit:TextEditor
+                        x:Name="CodeEditor"
+                        IsVisible="{Binding IsCodeViewActive}"
+                        ShowLineNumbers="True"
+                        SyntaxHighlighting="Markdown"
+                        WordWrap="True"
+                        FontFamily="Consolas, Cascadia Code, monospace"
+                        FontSize="13"
+                        Background="Transparent"
+                        Foreground="#E1E1E6"
+                        Margin="4" />
 
                     <!-- TODO: MD viewer -->
                 </Grid>
