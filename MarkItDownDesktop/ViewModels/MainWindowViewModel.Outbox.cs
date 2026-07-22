@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,17 +11,17 @@ namespace MarkItDownDesktop.ViewModels;
 
 public partial class MainWindowViewModel
 {
+    public ObservableCollection<ConvertedFile> ConvertedFiles { get; } = [];
+
     [ObservableProperty] private bool _isCodeViewActive = false;
+    [ObservableProperty] private ConvertedFile? _selectedFile;
+    [ObservableProperty] private string _codeViewText = string.Empty;
 
     [RelayCommand]
     private void SelectFileView() => IsCodeViewActive = false;
 
     [RelayCommand]
     private void SelectCodeView() => IsCodeViewActive = true;
-
-
-    [ObservableProperty] private ConvertedFile? _selectedFile;
-    [ObservableProperty] private string _codeViewText = string.Empty;
 
     partial void OnSelectedFileChanged(ConvertedFile? value)
     {
