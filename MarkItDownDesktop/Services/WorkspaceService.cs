@@ -77,7 +77,7 @@ public class WorkspaceService
 
                     File.Copy(path, destInboxPath);
 
-                    await ConvertToMarkdownAsync(path, destOutboxPath);
+                    await ConvertToMarkdownAsync(destInboxPath, destOutboxPath);
                 }
                 catch (Exception ex)
                 {
@@ -96,7 +96,7 @@ public class WorkspaceService
 
             var targetFilePath = GetMarkItDownExecutablePath();
             var result = await Cli.Wrap(targetFilePath)
-                .WithArguments(sourcePath)
+                .WithArguments(args => args.Add(sourcePath))
                 .WithStandardOutputPipe(PipeTarget.ToFile(outboxPath))
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stderrBuffer))
                 .WithValidation(CommandResultValidation.None)
