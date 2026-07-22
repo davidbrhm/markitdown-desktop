@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using MarkItDownDesktop.Enums;
 using MarkItDownDesktop.Models;
 using MarkItDownDesktop.Services;
 
@@ -26,6 +27,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
         InboxFiles.Clear();
         ConvertedFiles.Clear();
+
+        SelectedFile = null;
+        CodeViewText = string.Empty;
+        SetViewMode(OutboxViewMode.File);
 
         foreach (string path in inboxPaths)
             InboxFiles.Add(ConvertedFile.FromPath(path));

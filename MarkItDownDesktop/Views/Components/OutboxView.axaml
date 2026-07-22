@@ -5,7 +5,10 @@
              xmlns:userControls="using:MarkItDownDesktop.Views.Components"
              x:Class="MarkItDownDesktop.Views.Components.OutboxView"
              x:DataType="vm:MainWindowViewModel"
-             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit">
+             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
+             xmlns:enums="using:MarkItDownDesktop.Enums"
+             xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia">
 
     <UserControl.Styles>
         <Style Selector="Button:disabled /template/ ContentPresenter">
@@ -19,18 +22,25 @@
             <Border Grid.Column="0" Background="#252528" CornerRadius="8" Padding="3" BorderBrush="#333335"
                     BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="4">
-                    <Button Command="{Binding SelectFileViewCommand}"
-                            Classes.ToggleActive="{Binding !IsCodeViewActive}"
-                            Classes.ToggleInactive="{Binding IsCodeViewActive}"
-                            Content="File View" Padding="16,8"
-                            CornerRadius="6" BorderThickness="0" />
+                    <Button Content="File"
+                            Command="{Binding SetViewModeCommand}"
+                            CommandParameter="{x:Static enums:OutboxViewMode.File}"
+                            Classes.ToggleActive="{Binding IsFileViewActive}"
+                            Classes.ToggleInactive="{Binding !IsFileViewActive}" />
 
-                    <Button Command="{Binding SelectCodeViewCommand}"
+                    <Button Content="Code"
+                            Command="{Binding SetViewModeCommand}"
+                            CommandParameter="{x:Static enums:OutboxViewMode.Code}"
                             IsEnabled="{Binding SelectedFile, Converter={x:Static ObjectConverters.IsNotNull}}"
                             Classes.ToggleActive="{Binding IsCodeViewActive}"
-                            Classes.ToggleInactive="{Binding !IsCodeViewActive}"
-                            Content="Code View" Padding="16,8"
-                            CornerRadius="6" BorderThickness="0" />
+                            Classes.ToggleInactive="{Binding !IsCodeViewActive}" />
+
+                    <Button Content="Markdown"
+                            Command="{Binding SetViewModeCommand}"
+                            CommandParameter="{x:Static enums:OutboxViewMode.Markdown}"
+                            IsEnabled="{Binding SelectedFile, Converter={x:Static ObjectConverters.IsNotNull}}"
+                            Classes.ToggleActive="{Binding IsMarkdownViewActive}"
+                            Classes.ToggleInactive="{Binding !IsMarkdownViewActive}" />
                 </StackPanel>
             </Border>
         </Grid>
@@ -44,7 +54,7 @@
                              SelectionChanged="OnOutputListBoxSelectionChanged"
                              PointerReleased="OnOutputListBoxPointerReleased"
                              PointerMoved="OnOutputListBoxPointerMoved"
-                             IsVisible="{Binding !IsCodeViewActive}"
+                             IsVisible="{Binding IsFileViewActive}"
                              ItemsSource="{Binding ConvertedFiles}"
                              SelectionMode="Multiple"
                              Background="Transparent"
@@ -130,7 +140,11 @@
                         Foreground="#E1E1E6"
                         Margin="4" />
 
-                    <!-- TODO: MD viewer -->
+                    <!-- VIEW: MD View -->
+                    <md:MarkdownScrollViewer IsVisible="{Binding IsMarkdownViewActive}"
+                                             Markdown="{Binding CodeViewText}"
+                                             MarkdownStyleName="FluentTheme"
+                                             Margin="8" />
                 </Grid>
             </Panel>
         </Border>

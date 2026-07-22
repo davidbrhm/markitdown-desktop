@@ -29,16 +29,7 @@ public partial class MainWindowViewModel
 
 
     [RelayCommand]
-    private void SelectFileView() => ActiveViewMode = OutboxViewMode.File;
-
-    [RelayCommand]
-    private void SelectCodeView() => ActiveViewMode = OutboxViewMode.Code;
-
-    [RelayCommand]
-    private void SelectMarkdownView() => ActiveViewMode = OutboxViewMode.Markdown;
-
-    [RelayCommand]
-    private void SelectCodeView() => IsCodeViewActive = true;
+    private void SetViewMode(OutboxViewMode mode) => ActiveViewMode = mode;
 
     partial void OnSelectedFileChanged(ConvertedFile? value)
     {
@@ -50,7 +41,7 @@ public partial class MainWindowViewModel
     {
         if (selectedFiles.Count != 1)
         {
-            SelectFileView();
+            SetViewMode(OutboxViewMode.File);
             SelectedFile = null;
             CodeViewText = string.Empty;
             return;
