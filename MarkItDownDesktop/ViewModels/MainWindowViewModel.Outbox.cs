@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MarkItDownDesktop.Enums;
 using MarkItDownDesktop.Models;
 
 namespace MarkItDownDesktop.ViewModels;
@@ -12,13 +13,29 @@ namespace MarkItDownDesktop.ViewModels;
 public partial class MainWindowViewModel
 {
     public ObservableCollection<ConvertedFile> ConvertedFiles { get; } = [];
-
-    [ObservableProperty] private bool _isCodeViewActive = false;
     [ObservableProperty] private ConvertedFile? _selectedFile;
     [ObservableProperty] private string _codeViewText = string.Empty;
 
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsFileViewActive))]
+    [NotifyPropertyChangedFor(nameof(IsCodeViewActive))]
+    [NotifyPropertyChangedFor(nameof(IsMarkdownViewActive))]
+    private OutboxViewMode _activeViewMode = OutboxViewMode.File;
+
+    public bool IsFileViewActive => ActiveViewMode == OutboxViewMode.File;
+    public bool IsCodeViewActive => ActiveViewMode == OutboxViewMode.Code;
+    public bool IsMarkdownViewActive => ActiveViewMode == OutboxViewMode.Markdown;
+
+
     [RelayCommand]
-    private void SelectFileView() => IsCodeViewActive = false;
+    private void SelectFileView() => ActiveViewMode = OutboxViewMode.File;
+
+    [RelayCommand]
+    private void SelectCodeView() => ActiveViewMode = OutboxViewMode.Code;
+
+    [RelayCommand]
+    private void SelectMarkdownView() => ActiveViewMode = OutboxViewMode.Markdown;
 
     [RelayCommand]
     private void SelectCodeView() => IsCodeViewActive = true;
